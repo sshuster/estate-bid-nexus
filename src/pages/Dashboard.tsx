@@ -6,7 +6,7 @@ import MainLayout from "@/layouts/MainLayout";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { mockProperties, mockBids, mockAgentContracts } from "@/lib/mockData";
-import { AgGridReact } from "ag-grid-react";
+import { AgGridReact } from "ag-grid-react"; // This import is now correct
 import "ag-grid-community/styles/ag-grid.css";
 import "ag-grid-community/styles/ag-theme-alpine.css";
 import { Building2, Users, DollarSign, TrendingUp, Home, Plus } from "lucide-react";
