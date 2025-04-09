@@ -32,6 +32,16 @@ import {
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
 import { Input } from "@/components/ui/input";
+import { ColDef } from "ag-grid-community";
+
+// Define user type
+type User = typeof mockUsers[0];
+// Define property type
+type Property = typeof mockProperties[0];
+// Define bid type
+type Bid = typeof mockBids[0];
+// Define contract type
+type Contract = typeof mockAgentContracts[0];
 
 const AdminDashboard = () => {
   const { user, isAuthenticated, isAdmin } = useAuth();
@@ -41,8 +51,8 @@ const AdminDashboard = () => {
   const [bids, setBids] = useState(mockBids);
   const [contracts, setContracts] = useState(mockAgentContracts);
   const [searchTerm, setSearchTerm] = useState("");
-  const [userToDelete, setUserToDelete] = useState(null);
-  const [propertyToRemove, setPropertyToRemove] = useState(null);
+  const [userToDelete, setUserToDelete] = useState<User | null>(null);
+  const [propertyToRemove, setPropertyToRemove] = useState<Property | null>(null);
 
   // Redirect if not authenticated or not an admin
   if (!isAuthenticated) {
@@ -54,7 +64,7 @@ const AdminDashboard = () => {
   }
 
   // Format price for display
-  const formatPrice = (price) => {
+  const formatPrice = (price: number) => {
     return new Intl.NumberFormat("en-US", {
       style: "currency",
       currency: "USD",
@@ -77,7 +87,7 @@ const AdminDashboard = () => {
   );
 
   // Handle user deletion
-  const handleDeleteUser = (userId) => {
+  const handleDeleteUser = (userId: string) => {
     // Find the user to delete
     const userToRemove = users.find(u => u.id === userId);
     if (userToRemove) {
@@ -104,7 +114,7 @@ const AdminDashboard = () => {
   };
 
   // Handle property removal
-  const handleRemoveProperty = (propertyId) => {
+  const handleRemoveProperty = (propertyId: string) => {
     // Find the property to remove
     const propertyToDelete = properties.find(p => p.id === propertyId);
     if (propertyToDelete) {
@@ -131,13 +141,14 @@ const AdminDashboard = () => {
   };
 
   // AG-Grid column definitions for users
-  const userColumns = [
+  const userColumns: ColDef<User>[] = [
     { headerName: "Username", field: "username", sortable: true, filter: true, flex: 1 },
     { headerName: "Email", field: "email", sortable: true, filter: true, flex: 1 },
     { headerName: "Role", field: "role", sortable: true, filter: true },
     { 
       headerName: "Actions", 
-      cellRenderer: params => {
+      field: "id",
+      cellRenderer: (params) => {
         return (
           <Button
             variant="destructive"
@@ -153,7 +164,7 @@ const AdminDashboard = () => {
   ];
 
   // AG-Grid column definitions for properties
-  const propertyColumns = [
+  const propertyColumns: ColDef<Property>[] = [
     { headerName: "Title", field: "title", sortable: true, filter: true, flex: 1 },
     { headerName: "Type", field: "type", sortable: true, filter: true },
     { 
@@ -161,17 +172,23 @@ const AdminDashboard = () => {
       field: "ownerId", 
       sortable: true, 
       filter: true,
-      valueGetter: params => {
+      valueGetter: (params) => {
         const owner = users.find(u => u.id === params.data.ownerId);
         return owner ? owner.username : 'Unknown User';
       }
     },
-    { headerName: "Price", field: "price", sortable: true, filter: true, 
-      valueFormatter: params => formatPrice(params.value) },
+    { 
+      headerName: "Price", 
+      field: "price", 
+      sortable: true, 
+      filter: true, 
+      valueFormatter: (params) => formatPrice(params.value) 
+    },
     { headerName: "Status", field: "status", sortable: true, filter: true },
     { 
       headerName: "Actions", 
-      cellRenderer: params => {
+      field: "id",
+      cellRenderer: (params) => {
         return (
           <Button
             variant="destructive"
@@ -187,14 +204,14 @@ const AdminDashboard = () => {
   ];
 
   // AG-Grid column definitions for bids
-  const bidColumns = [
+  const bidColumns: ColDef<Bid>[] = [
     { 
       headerName: "Property", 
       field: "propertyId", 
       sortable: true, 
       filter: true,
       flex: 1,
-      valueGetter: params => {
+      valueGetter: (params) => {
         const property = properties.find(p => p.id === params.data.propertyId);
         return property ? property.title : 'Unknown Property';
       }
@@ -204,19 +221,30 @@ const AdminDashboard = () => {
       field: "userId", 
       sortable: true, 
       filter: true,
-      valueGetter: params => {
+      valueGetter: (params) => {
         const user = users.find(u => u.id === params.data.userId);
         return user ? user.username : 'Unknown User';
       }
     },
-    { headerName: "Amount", field: "amount", sortable: true, filter: true,
-      valueFormatter: params => formatPrice(params.value) },
+    { 
+      headerName: "Amount", 
+      field: "amount", 
+      sortable: true, 
+      filter: true,
+      valueFormatter: (params) => formatPrice(params.value) 
+    },
     { headerName: "Status", field: "status", sortable: true, filter: true },
-    { headerName: "Date", field: "timestamp", sortable: true, filter: true,
-      valueFormatter: params => new Date(params.value).toLocaleDateString() },
+    { 
+      headerName: "Date", 
+      field: "timestamp", 
+      sortable: true, 
+      filter: true,
+      valueFormatter: (params) => new Date(params.value).toLocaleDateString() 
+    },
     { 
       headerName: "Actions", 
-      cellRenderer: params => {
+      field: "status", 
+      cellRenderer: (params) => {
         if (params.data.status === "pending") {
           return (
             <div className="flex space-x-2">
@@ -236,14 +264,14 @@ const AdminDashboard = () => {
   ];
 
   // AG-Grid column definitions for contracts
-  const contractColumns = [
+  const contractColumns: ColDef<Contract>[] = [
     { 
       headerName: "Property", 
       field: "propertyId", 
       sortable: true, 
       filter: true,
       flex: 1,
-      valueGetter: params => {
+      valueGetter: (params) => {
         const property = properties.find(p => p.id === params.data.propertyId);
         return property ? property.title : 'Unknown Property';
       }
@@ -253,7 +281,7 @@ const AdminDashboard = () => {
       field: "ownerId", 
       sortable: true, 
       filter: true,
-      valueGetter: params => {
+      valueGetter: (params) => {
         const owner = users.find(u => u.id === params.data.ownerId);
         return owner ? owner.username : 'Unknown User';
       }
@@ -263,21 +291,37 @@ const AdminDashboard = () => {
       field: "agentId", 
       sortable: true, 
       filter: true,
-      valueGetter: params => {
+      valueGetter: (params) => {
         const agent = users.find(u => u.id === params.data.agentId);
         return agent ? agent.username : 'Unknown User';
       }
     },
-    { headerName: "Commission", field: "commission", sortable: true, filter: true,
-      valueFormatter: params => `${params.value}%` },
+    { 
+      headerName: "Commission", 
+      field: "commission", 
+      sortable: true, 
+      filter: true,
+      valueFormatter: (params) => `${params.value}%` 
+    },
     { headerName: "Status", field: "status", sortable: true, filter: true },
-    { headerName: "Start Date", field: "startDate", sortable: true, filter: true,
-      valueFormatter: params => new Date(params.value).toLocaleDateString() },
-    { headerName: "End Date", field: "endDate", sortable: true, filter: true,
-      valueFormatter: params => new Date(params.value).toLocaleDateString() },
+    { 
+      headerName: "Start Date", 
+      field: "startDate", 
+      sortable: true, 
+      filter: true,
+      valueFormatter: (params) => new Date(params.value).toLocaleDateString() 
+    },
+    { 
+      headerName: "End Date", 
+      field: "endDate", 
+      sortable: true, 
+      filter: true,
+      valueFormatter: (params) => new Date(params.value).toLocaleDateString() 
+    },
     { 
       headerName: "Actions", 
-      cellRenderer: params => {
+      field: "status", 
+      cellRenderer: (params) => {
         if (params.data.status === "pending") {
           return (
             <div className="flex space-x-2">
